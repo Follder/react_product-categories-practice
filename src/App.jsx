@@ -29,13 +29,16 @@ const products = productsFromServer.map(product => {
 
 const TABLE_HEADER = ['ID', 'Product', 'Category', 'User'];
 const USERS_FILTER = usersFromServer.map(user => user.name);
+const CATEGORIES_FILTER = categoriesFromServer.map(category => category.title);
 const ASC_SORT = 'asc';
 const DESC_SORT = 'desc';
 
 USERS_FILTER.unshift('All');
+CATEGORIES_FILTER.unshift('All');
 
 export const App = () => {
   const [filterByUser, setFilterByUser] = useState('All');
+  const [filterByCategory, setfilterByCategory] = useState('All');
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState('');
   const [sortOrder, setSortOrder] = useState(ASC_SORT);
@@ -46,6 +49,12 @@ export const App = () => {
   if (filterByUser !== 'All') {
     visibleGoods = visibleGoods.filter(
       good => good.category.user.name === filterByUser,
+    );
+  }
+
+  if (filterByCategory !== 'All') {
+    visibleGoods = visibleGoods.filter(
+      good => good.category.title === filterByCategory,
     );
   }
 
@@ -110,6 +119,7 @@ export const App = () => {
 
   function handleResetAll() {
     setFilterByUser('All');
+    setfilterByCategory('All');
     setQuery('');
     setSortBy('');
     setSortOrder(ASC_SORT);
@@ -169,36 +179,25 @@ export const App = () => {
             </div>
 
             <div className="panel-block is-flex-wrap-wrap">
-              <a
-                href="#/"
-                data-cy="AllCategories"
-                className="button is-success mr-6 is-outlined"
-              >
-                All
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 1
-              </a>
-
-              <a data-cy="Category" className="button mr-2 my-1" href="#/">
-                Category 2
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 3
-              </a>
-              <a data-cy="Category" className="button mr-2 my-1" href="#/">
-                Category 4
-              </a>
+              {CATEGORIES_FILTER.map((category, i) => (
+                <a
+                  key={category}
+                  href="#/"
+                  data-cy={
+                    category[i] === category[0] ? 'AllCategories' : 'Category'
+                  }
+                  className={cn('button', {
+                    'is-success mr-6 is-outlined': category[i] === category[0],
+                    'mr-2 my-1': category[i] !== category[0],
+                    'mr-2 my-1 is-info':
+                      category[i] !== category[0] &&
+                      category === filterByCategory,
+                  })}
+                  onClick={() => setfilterByCategory(category)}
+                >
+                  {category}
+                </a>
+              ))}
             </div>
 
             <div className="panel-block">
