@@ -27,13 +27,19 @@ const products = productsFromServer.map(product => {
   };
 });
 
+const TABLE_HEADER = ['ID', 'Product', 'Category', 'User'];
 const USERS_FILTER = usersFromServer.map(user => user.name);
+const ASC_SORT = 'asc';
+const DESC_SORT = 'desc';
 
 USERS_FILTER.unshift('All');
 
 export const App = () => {
   const [filterByUser, setFilterByUser] = useState('All');
   const [query, setQuery] = useState('');
+  const [sortBy, setSortBy] = useState('');
+  const [sortOrder, setSortOrder] = useState(ASC_SORT);
+  const [sortClass, setSortClass] = useState('');
 
   let visibleGoods = [...products];
 
@@ -52,9 +58,62 @@ export const App = () => {
     });
   }
 
-  function reset() {
+  const handleSort = value => {
+    if (sortBy !== value) {
+      setSortBy(value);
+      setSortOrder(ASC_SORT);
+      setSortClass(ASC_SORT);
+
+      return;
+    }
+
+    if (sortBy === value && sortOrder === ASC_SORT) {
+      setSortOrder(DESC_SORT);
+      setSortClass(DESC_SORT);
+
+      return;
+    }
+
+    setSortBy('');
+    setSortOrder(ASC_SORT);
+    setSortClass('');
+  };
+
+  if (sortBy !== '') {
+    const prettySortBy = sortBy.toLowerCase();
+
+    visibleGoods.sort((good1, good2) => {
+      let result;
+
+      switch (prettySortBy) {
+        case 'id':
+          result = good1.id - good2.id;
+          break;
+        case 'product':
+          result = good1.name.localeCompare(good2.name);
+          break;
+        case 'category':
+          result = good1.category.title.localeCompare(good2.category.title);
+          break;
+        case 'user':
+          result = good1.category.user.name.localeCompare(
+            good2.category.user.name,
+          );
+          break;
+        default:
+          return 0;
+      }
+
+      return sortOrder === ASC_SORT ? result : result * -1;
+    });
+  }
+
+  function handleResetAll() {
     setFilterByUser('All');
     setQuery('');
+    setSortBy('');
+    setSortOrder(ASC_SORT);
+    setSortClass('');
   }
 
   return (
@@ -147,7 +206,7 @@ export const App = () => {
                 data-cy="ResetAllButton"
                 href="#/"
                 className="button is-link is-outlined is-fullwidth"
-                onClick={reset}
+                onClick={handleResetAll}
               >
                 Reset all filters
               </a>
@@ -166,49 +225,27 @@ export const App = () => {
           >
             <thead>
               <tr>
-                <th>
-                  <span className="is-flex is-flex-wrap-nowrap">
-                    ID
-                    <a href="#/">
-                      <span className="icon">
-                        <i data-cy="SortIcon" className="fas fa-sort" />
-                      </span>
-                    </a>
-                  </span>
-                </th>
-
-                <th>
-                  <span className="is-flex is-flex-wrap-nowrap">
-                    Product
-                    <a href="#/">
-                      <span className="icon">
-                        <i data-cy="SortIcon" className="fas fa-sort-down" />
-                      </span>
-                    </a>
-                  </span>
-                </th>
-
-                <th>
-                  <span className="is-flex is-flex-wrap-nowrap">
-                    Category
-                    <a href="#/">
-                      <span className="icon">
-                        <i data-cy="SortIcon" className="fas fa-sort-up" />
-                      </span>
-                    </a>
-                  </span>
-                </th>
-
-                <th>
-                  <span className="is-flex is-flex-wrap-nowrap">
-                    User
-                    <a href="#/">
-                      <span className="icon">
-                        <i data-cy="SortIcon" className="fas fa-sort" />
-                      </span>
-                    </a>
-                  </span>
-                </th>
+                {TABLE_HEADER.map(item => (
+                  <th key={item}>
+                    <span className="is-flex is-flex-wrap-nowrap">
+                      {item}
+                      <a href="#/" onClick={() => handleSort(item)}>
+                        <span className="icon">
+                          <i
+                            data-cy="SortIcon"
+                            className={cn('fa', {
+                              'fa-sort-up': sortClass === ASC_SORT,
+                              'fa-sort-down': sortClass === DESC_SORT,
+                              'fa-sort':
+                                sortClass !== ASC_SORT &&
+                                sortClass !== DESC_SORT,
+                            })}
+                          />
+                        </span>
+                      </a>
+                    </span>
+                  </th>
+                ))}
               </tr>
             </thead>
 
