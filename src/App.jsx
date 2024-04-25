@@ -33,6 +33,7 @@ USERS_FILTER.unshift('All');
 
 export const App = () => {
   const [filterByUser, setFilterByUser] = useState('All');
+  const [query, setQuery] = useState('');
 
   let visibleGoods = [...products];
 
@@ -40,6 +41,15 @@ export const App = () => {
     visibleGoods = visibleGoods.filter(
       good => good.category.user.name === filterByUser,
     );
+  }
+
+  if (query !== '') {
+    visibleGoods = visibleGoods.filter(good => {
+      const prettyQuery = query.toLowerCase().trim();
+      const prettyGood = good.name.toLowerCase().trim();
+
+      return prettyGood.includes(prettyQuery);
+    });
   }
 
   return (
@@ -74,7 +84,8 @@ export const App = () => {
                   type="text"
                   className="input"
                   placeholder="Search"
-                  value="qwe"
+                  value={query}
+                  onChange={event => setQuery(event.target.value)}
                 />
 
                 <span className="icon is-left">
@@ -87,6 +98,7 @@ export const App = () => {
                     data-cy="ClearButton"
                     type="button"
                     className="delete"
+                    onClick={() => setQuery('')}
                   />
                 </span>
               </p>
