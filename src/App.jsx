@@ -215,69 +215,71 @@ export const App = () => {
         </div>
 
         <div className="box table-container">
-          <p data-cy="NoMatchingMessage">
-            No products matching selected criteria
-          </p>
+          {visibleGoods.length === 0 ? (
+            <p data-cy="NoMatchingMessage">
+              No products matching selected criteria
+            </p>
+          ) : (
+            <table
+              data-cy="ProductTable"
+              className="table is-striped is-narrow is-fullwidth"
+            >
+              <thead>
+                <tr>
+                  {TABLE_HEADER.map(item => (
+                    <th key={item}>
+                      <span className="is-flex is-flex-wrap-nowrap">
+                        {item}
+                        <a href="#/" onClick={() => handleSort(item)}>
+                          <span className="icon">
+                            <i
+                              data-cy="SortIcon"
+                              className={cn('fa', {
+                                'fa-sort-up': sortClass === ASC_SORT,
+                                'fa-sort-down': sortClass === DESC_SORT,
+                                'fa-sort':
+                                  sortClass !== ASC_SORT &&
+                                  sortClass !== DESC_SORT,
+                              })}
+                            />
+                          </span>
+                        </a>
+                      </span>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
 
-          <table
-            data-cy="ProductTable"
-            className="table is-striped is-narrow is-fullwidth"
-          >
-            <thead>
-              <tr>
-                {TABLE_HEADER.map(item => (
-                  <th key={item}>
-                    <span className="is-flex is-flex-wrap-nowrap">
-                      {item}
-                      <a href="#/" onClick={() => handleSort(item)}>
-                        <span className="icon">
-                          <i
-                            data-cy="SortIcon"
-                            className={cn('fa', {
-                              'fa-sort-up': sortClass === ASC_SORT,
-                              'fa-sort-down': sortClass === DESC_SORT,
-                              'fa-sort':
-                                sortClass !== ASC_SORT &&
-                                sortClass !== DESC_SORT,
-                            })}
-                          />
-                        </span>
-                      </a>
-                    </span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
+              <tbody>
+                {visibleGoods.map(good => {
+                  const { category } = good;
+                  const { user } = category;
 
-            <tbody>
-              {visibleGoods.map(good => {
-                const { category } = good;
-                const { user } = category;
+                  return (
+                    <tr data-cy="Product" key={good.id}>
+                      <td className="has-text-weight-bold" data-cy="ProductId">
+                        {good.id}
+                      </td>
 
-                return (
-                  <tr data-cy="Product" key={good.id}>
-                    <td className="has-text-weight-bold" data-cy="ProductId">
-                      {good.id}
-                    </td>
+                      <td data-cy="ProductName">{good.name}</td>
+                      <td data-cy="ProductCategory">
+                        {category.icon} - {category.title}
+                      </td>
 
-                    <td data-cy="ProductName">{good.name}</td>
-                    <td data-cy="ProductCategory">
-                      {category.icon} - {category.title}
-                    </td>
-
-                    <td
-                      data-cy="ProductUser"
-                      className={
-                        user.sex === 'm' ? 'has-text-link' : 'has-text-danger'
-                      }
-                    >
-                      {user.name}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      <td
+                        data-cy="ProductUser"
+                        className={
+                          user.sex === 'm' ? 'has-text-link' : 'has-text-danger'
+                        }
+                      >
+                        {user.name}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
