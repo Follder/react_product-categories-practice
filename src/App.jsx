@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
-import React from 'react';
+import React, { useState } from 'react';
+import cn from 'classnames';
 import './App.scss';
 
 import usersFromServer from './api/users';
@@ -42,21 +43,16 @@ export const App = () => (
           <p className="panel-heading">Filters</p>
 
           <p className="panel-tabs has-text-weight-bold">
-            <a data-cy="FilterAllUsers" href="#/">
-              All
-            </a>
-
-            <a data-cy="FilterUser" href="#/">
-              User 1
-            </a>
-
-            <a data-cy="FilterUser" href="#/" className="is-active">
-              User 2
-            </a>
-
-            <a data-cy="FilterUser" href="#/">
-              User 3
-            </a>
+            {USERS_FILTER.map((user, i) => (
+              <a
+                key={user}
+                data-cy={user[i] === user[0] ? 'FilterAllUsers' : 'FilterUser'}
+                href="#/"
+                className={cn('', { 'is-active': true })}
+              >
+                {user}
+              </a>
+            ))}
           </p>
 
           <div className="panel-block">
